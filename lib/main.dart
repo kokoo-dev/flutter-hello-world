@@ -59,6 +59,13 @@ class _MyHomePageState extends State<MyHomePage> {
     var appState = context.watch<MyAppState>();
     var pair = appState.current;
 
+    IconData icon;
+    if (appState.favorites.contains(pair)) {
+      icon = Icons.favorite;
+    } else {
+      icon = Icons.favorite_border;
+    }
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
@@ -77,11 +84,23 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             BigCard(pair: pair),
             const SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: () {
-                appState.getNext();
-              },
-              child: const Text('Next')
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ElevatedButton.icon(
+                  onPressed: () {
+                    appState.toggleFavorite();
+                  },
+                  icon: Icon(icon),
+                  label: const Text('Like')
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    appState.getNext();
+                  },
+                  child: const Text('Next')
+                ),
+              ],
             ),
           ],
         ),
@@ -129,6 +148,17 @@ class MyAppState extends ChangeNotifier {
 
   void getNext() {
     current = WordPair.random();
+    notifyListeners();
+  }
+
+  var favorites = <WordPair>[];
+
+  void toggleFavorite() {
+    if (favorites.contains(current)) {
+      favorites.remove(current);
+    } else {
+      favorites.add(current);
+    }
     notifyListeners();
   }
 }
